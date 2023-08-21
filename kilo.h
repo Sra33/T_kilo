@@ -7,6 +7,7 @@
 #include <termios.h>
 #include <unistd.h>
 
+#define CTRL_KEY(k) ((k)&0x1f)
 void disableRawMode();
 void enableRawMode();
 #endif // KILO_H_
