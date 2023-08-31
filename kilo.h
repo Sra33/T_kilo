@@ -10,4 +10,5 @@
 #define CTRL_KEY(k) ((k)&0x1f)
 void disableRawMode();
 void enableRawMode();
+int getCursorPosition(int *, int *);
 #endif // KILO_H_

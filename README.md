@@ -53,3 +53,17 @@ FNCTL(File Control) - It is a unix system call and allows operations to be perfo
 - Once the escape sequence is written, the screen is cleared but the curosr is usually at the bottom
 - To move it to the top \x1b[H is written to the terminal,which is 3 bytes
 - H takes two arguments the row and column of the cursor position, by default it is set to <esc>[1;1H, since row and column start at position 1 not 0
+
+## GETTING WINDOWS SIZE
+- ioctl() function with the TIOCGWINSZ(Terminal Input Output Control Get WINdow SiZE) request in most system can be used to determine the size of the terminal
+and the stores the number of column and row in the winsize struct, this function and struct is provided for by sys/ioctl
+- Since the ioctl function is not a guarantee to be able to request window size on all system, a fallback method is to position the cursor at the bottom-right 
+of the screen, then use escape sequence that lets us query the position of the cursor to tell us how many rows and column
+- The "\x1b[999C\x1b[999B" is used to move the cursor to the bottom right of the screen, x1b is the excape character, the C commnad tells the cursor to move 
+to the right and the 999 value is the specified amount of time to move to the right the value is intentionally large to ensure that the cursor is at the 
+maximum right, two escape sequence are sent the first to move to the right and the second is used to move to the maximum bottom, the C and B command ensures
+that the cursor stops going past the edge
+- We use the read function to read the reply from the terminal which is an escap character followed by [ and then 24;80R, the response is inserted into an
+array called buf and then sscanf function is used to pass the formatted outpu(row and col value) to the row and colum variable
+- sscanf is a function that takes a source string, a format and destination variables and it puts the various specified data from the source string into the 
+specified variable
