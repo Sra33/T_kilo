@@ -1,37 +1,6 @@
 #include "kilo.h"
-#include <asm-generic/errno-base.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <sys/ttydefaults.h>
-#include <unistd.h>
-
-enum editorKey {
-  ARROW_LEFT = 1000,
-  ARROW_RIGHT,
-  ARROW_UP,
-  ARROW_DOWN,
-  PAGE_UP,
-  PAGE_DOWN
-};
-
-struct editorConfig {
-  int cx, cy;
-  struct termios orig_termios;
-  int screenrows;
-  int screencols;
-};
 
 struct editorConfig E;
-
-struct abuf {
-  char *b;
-  int len;
-};
-
-#define ABUF_INIT                                                              \
-  { NULL, 0 }
 
 /**
  * die - prints out error message to terminal
@@ -184,10 +153,20 @@ int editorReadKey() {
           return '\x1b';
         if (seq[2] == '~') {
           switch (seq[1]) {
+          case '1':
+            return HOME_KEY;
+          case '2':
+            return END_KEY;
+          case '3':
+            return DEL_KEY;
           case '5':
             return PAGE_UP;
           case '6':
-            return PAGE_UP;
+            return PAGE_DOWN;
+          case '7':
+            return HOME_KEY;
+          case '8':
+            return END_KEY;
           }
         }
       } else {
@@ -200,7 +179,18 @@ int editorReadKey() {
           return ARROW_RIGHT;
         case 'D':
           return ARROW_LEFT;
+        case 'H':
+          return HOME_KEY;
+        case 'F':
+          return END_KEY;
         }
+      }
+    } else if (seq[0] == '0') {
+      switch (seq[1]) {
+      case 'H':
+        return HOME_KEY;
+      case 'F':
+        return END_KEY;
       }
     }
 
@@ -227,12 +217,12 @@ void editorCursorMove(unsigned int key) {
       E.cx++;
     }
     break;
-  case ARROW_DOWN:
+  case ARROW_UP:
     if (E.cy != 0) {
       E.cy--;
     }
     break;
-  case ARROW_UP:
+  case ARROW_DOWN:
     if (E.cy != E.screenrows - 1) {
       E.cy++;
     }
@@ -244,6 +234,14 @@ void editorProcessKeyPress() {
   int c = editorReadKey();
 
   switch (c) {
+  case HOME_KEY:
+    E.cx = 0;
+    break;
+
+  case END_KEY:
+    E.cy = 0;
+    break;
+
   case CTRL_KEY('q'):
     write(STDOUT_FILENO, "\x1b[2J", 4);
     write(STDOUT_FILENO, "\x1b[H", 3);

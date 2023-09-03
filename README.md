@@ -67,3 +67,5 @@ that the cursor stops going past the edge
 array called buf and then sscanf function is used to pass the formatted outpu(row and col value) to the row and colum variable
 - sscanf is a function that takes a source string, a format and destination variables and it puts the various specified data from the source string into the 
 specified variable
+
+- rows is | and column is - for this code , will probably fix soon
