@@ -69,3 +69,9 @@ array called buf and then sscanf function is used to pass the formatted outpu(ro
 specified variable
 
 - rows is | and column is - for this code , will probably fix soon
+
+## EditorOpen function
+- This function is used to open a file, which name is given as an argument , the function uses the getline function this function is used to read when the size of what being read is not known
+- The getline function takes three arguments first a char * pointer that stores the string that is being read
+- It also takes the a size)_t variable which it writes the capacity or total amount read from the file
+- And finally itr takes a file descriptor which sets what files should be read
