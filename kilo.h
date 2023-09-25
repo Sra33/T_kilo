@@ -4,16 +4,19 @@
 #include <ctype.h>
 #include <errno.h>
 #include <stddef.h>
-#include <stdio.h>
+
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/ttydefaults.h>
 #include <sys/types.h>
 #include <termios.h>
+#include <time.h>
 #include <unistd.h>
 
 #define KILO_VERSION "1"
+#define KILO_TABSTOP 8
 /*
  * erow - data type for storing row of text
  * @size: int , size of the data
@@ -22,6 +25,8 @@
 typedef struct erow {
   int size;
   char *chars;
+  int rsize;
+  char *render;
 } erow;
 
 enum editorKey {
@@ -38,12 +43,16 @@ enum editorKey {
 
 struct editorConfig {
   int cx, cy;
+  int rx;
   int screenrows;
   int screencols;
   int numrows;
   int rowoff;
   int coloff;
   erow *row;
+  char *filename;
+  char statusmsg[80];
+  char statusmsg_time;
   struct termios orig_termios;
 };
 
@@ -69,7 +78,12 @@ void editorProcessKeyPress();
 void editorDrawRows(struct abuf *);
 void editorRefreshScreen();
 void editorAppendRow(char *, size_t);
+void editorUpdateRow(erow *);
+void editorDrawStatusBar(struct abuf *);
+void editorStatusMessage(const char *fmt, ...);
+void editorDrawMessageBar(struct abuf *);
 
+int editorRowCxToRx(erow *, int);
 int getCursorPosition(int *, int *);
 int getWindowSize(int *row, int *cols);
 int editorReadKey();
